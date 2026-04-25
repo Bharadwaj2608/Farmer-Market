@@ -2,15 +2,16 @@ import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import api from '../utils/api'
 import { RiRobot2Line, RiCloseLine, RiSendPlane2Line, RiPlantLine } from 'react-icons/ri'
+
 const cleanContent = (text) => {
   return text
-    .replace(/\*\*(.*?)\*\*/g, '$1')  
-    .replace(/\*\*(.*?)\*\*/g, '$1')     // Remove **bold**
-    .replace(/\*(.*?)\*/g, '$1')            // Remove *italic*
-    .replace(/#{1,6}\s*/g, '')              // Remove ### headers
-    .replace(/\b(\w+)\s+\1\b/gi, '$1')     // Remove duplicate words
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/#{1,6}\s*/g, '')
+    .replace(/\b(\w+)\s+\1\b/gi, '$1')
     .trim()
 }
+
 const SUGGESTIONS = {
   farmer: [
     'What crops should I grow this season?',
@@ -86,29 +87,32 @@ export default function ChatBot() {
 
   return (
     <>
-      {/* Floating button */}
+      {/* ⭐ Floating button */}
       <button onClick={() => setOpen(o => !o)} style={s.fab}>
         {open
           ? <RiCloseLine size={22} color="#fff" />
-          : <RiRobot2Line size={22} color="#fff" />
+          : <RiRobot2Line size={22} color="#1a2e1a" />
         }
         {!open && <span style={s.fabLabel}>FarmBot</span>}
       </button>
 
-      {/* Chat window */}
+      {/* ⭐ Chat window — fully dark */}
       {open && (
         <div style={s.window}>
+
           {/* Header */}
           <div style={s.header}>
             <div style={s.headerLeft}>
-              <div style={s.botAvatar}><RiPlantLine size={16} color="#fff" /></div>
+              <div style={s.botAvatar}>
+                <RiPlantLine size={16} color="#c8e840" />
+              </div>
               <div>
                 <p style={s.botName}>FarmBot</p>
                 <p style={s.botStatus}>AI assistant · online</p>
               </div>
             </div>
             <button onClick={() => setOpen(false)} style={s.closeBtn}>
-              <RiCloseLine size={18} />
+              <RiCloseLine size={18} color="#c8e840" />
             </button>
           </div>
 
@@ -117,11 +121,13 @@ export default function ChatBot() {
             {messages.map((msg, i) => (
               <div key={i} style={{ ...s.msgRow, ...(msg.role === 'user' ? s.msgRowUser : {}) }}>
                 {msg.role === 'assistant' && (
-                  <div style={s.msgAvatar}><RiPlantLine size={12} color="var(--green)" /></div>
+                  <div style={s.msgAvatar}>
+                    <RiPlantLine size={12} color="#c8e840" />
+                  </div>
                 )}
                 <div style={{ ...s.bubble, ...(msg.role === 'user' ? s.bubbleUser : s.bubbleBot) }}>
                   {msg.content.split('\n').map((line, j) => (
-                    <span key={j}>{line}{j < msg.content.split('\n').length - 1 && <br />}</span>
+                    <span key={j}>{cleanContent(line)}{j < msg.content.split('\n').length - 1 && <br />}</span>
                   ))}
                 </div>
               </div>
@@ -129,10 +135,14 @@ export default function ChatBot() {
 
             {loading && (
               <div style={s.msgRow}>
-                <div style={s.msgAvatar}><RiPlantLine size={12} color="var(--green)" /></div>
-                <div style={s.bubbleBot}>
-                  <div style={s.typing}>
-                    <span /><span /><span />
+                <div style={s.msgAvatar}>
+                  <RiPlantLine size={12} color="#c8e840" />
+                </div>
+                <div style={{ ...s.bubbleBot, padding: '12px 16px' }}>
+                  <div style={s.typingDots}>
+                    <span style={s.dot} className="dot1" />
+                    <span style={s.dot} className="dot2" />
+                    <span style={s.dot} className="dot3" />
                   </div>
                 </div>
               </div>
@@ -140,7 +150,7 @@ export default function ChatBot() {
             <div ref={bottomRef} />
           </div>
 
-          {/* Suggestions — only show at start */}
+          {/* Suggestions */}
           {messages.length === 1 && (
             <div style={s.suggestions}>
               {(SUGGESTIONS[user.role] || SUGGESTIONS.buyer).map((s_text, i) => (
@@ -151,7 +161,7 @@ export default function ChatBot() {
             </div>
           )}
 
-          {/* Input */}
+          {/* ⭐ Dark input row */}
           <div style={s.inputRow}>
             <textarea
               ref={inputRef}
@@ -162,8 +172,15 @@ export default function ChatBot() {
               rows={1}
               style={s.input}
             />
-            <button onClick={() => sendMessage()} disabled={!input.trim() || loading} style={s.sendBtn}>
-              <RiSendPlane2Line size={16} />
+            <button
+              onClick={() => sendMessage()}
+              disabled={!input.trim() || loading}
+              style={{
+                ...s.sendBtn,
+                opacity: !input.trim() || loading ? 0.4 : 1,
+              }}
+            >
+              <RiSendPlane2Line size={16} color="#1a2e1a" />
             </button>
           </div>
         </div>
@@ -171,8 +188,22 @@ export default function ChatBot() {
 
       <style>{`
         @keyframes bounce {
-          0%, 80%, 100% { transform: translateY(0); }
-          40% { transform: translateY(-6px); }
+          0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+          40% { transform: translateY(-5px); opacity: 1; }
+        }
+        .dot1 { animation: bounce 1.2s infinite 0s; }
+        .dot2 { animation: bounce 1.2s infinite 0.2s; }
+        .dot3 { animation: bounce 1.2s infinite 0.4s; }
+
+        /* ⭐ Dark scrollbar */
+        div::-webkit-scrollbar { width: 4px; }
+        div::-webkit-scrollbar-track { background: #1a2e1a; }
+        div::-webkit-scrollbar-thumb { background: #3a5c3a; border-radius: 4px; }
+
+        /* ⭐ Input focus */
+        .farmbot-input:focus {
+          border-color: #c8e840 !important;
+          outline: none !important;
         }
       `}</style>
     </>
@@ -180,97 +211,126 @@ export default function ChatBot() {
 }
 
 const s = {
+  // ⭐ Floating button — lime green
   fab: {
     position: 'fixed', bottom: 28, right: 28, zIndex: 1000,
     display: 'flex', alignItems: 'center', gap: 8,
-    background: 'var(--green)', color: '#fff',
+    background: '#c8e840',
     border: 'none', borderRadius: 50, padding: '12px 18px',
-    cursor: 'pointer', boxShadow: '0 4px 16px rgba(42,92,63,0.35)',
-    fontSize: 14, fontWeight: 500, fontFamily: 'var(--font-body)',
+    cursor: 'pointer', boxShadow: '0 4px 20px rgba(200,232,64,0.3)',
+    fontSize: 14, fontWeight: 600, color: '#1a2e1a',
     transition: 'all 0.2s',
   },
-  fabLabel: { fontSize: 14, fontWeight: 500 },
+  fabLabel: { fontSize: 14, fontWeight: 600, color: '#1a2e1a' },
+
+  // ⭐ Dark chat window
   window: {
     position: 'fixed', bottom: 90, right: 28, zIndex: 999,
-    width: 360, background: '#fff',
-    border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)',
-    boxShadow: '0 8px 32px rgba(45,36,22,0.15)',
+    width: 360,
+    background: '#0f1f0f',                          // very dark green
+    border: '1px solid #3a5c3a',
+    borderRadius: '16px',
+    boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
     display: 'flex', flexDirection: 'column', overflow: 'hidden',
     maxHeight: '70vh',
   },
+
+  // ⭐ Dark header
   header: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '14px 16px', background: 'var(--green)',
+    padding: '14px 16px',
+    background: '#1a2e1a',
+    borderBottom: '1px solid #3a5c3a',
   },
   headerLeft: { display: 'flex', alignItems: 'center', gap: 10 },
   botAvatar: {
     width: 32, height: 32, borderRadius: '50%',
-    background: 'rgba(255,255,255,0.2)',
+    background: 'rgba(200,232,64,0.15)',
+    border: '1px solid rgba(200,232,64,0.3)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   },
-  botName: { fontSize: 14, fontWeight: 600, color: '#fff', margin: 0 },
-  botStatus: { fontSize: 11, color: 'rgba(255,255,255,0.7)', margin: 0 },
+  botName: { fontSize: 14, fontWeight: 600, color: '#c8e840', margin: 0 },
+  botStatus: { fontSize: 11, color: '#7a9e6e', margin: 0 },
   closeBtn: {
-    background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 6,
-    color: '#fff', cursor: 'pointer', padding: 4, display: 'flex',
+    background: 'rgba(200,232,64,0.1)', border: '1px solid rgba(200,232,64,0.2)',
+    borderRadius: 6, cursor: 'pointer', padding: 4,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
   },
+
+  // ⭐ Dark messages area
   messages: {
     flex: 1, overflowY: 'auto', padding: '14px 14px 8px',
     display: 'flex', flexDirection: 'column', gap: 10,
-    minHeight: 240,
+    minHeight: 240, background: '#0f1f0f',
   },
   msgRow: { display: 'flex', alignItems: 'flex-end', gap: 6 },
   msgRowUser: { flexDirection: 'row-reverse' },
   msgAvatar: {
     width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
-    background: 'var(--green-pale)',
+    background: 'rgba(200,232,64,0.1)',
+    border: '1px solid rgba(200,232,64,0.2)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   },
   bubble: {
     maxWidth: '78%', padding: '9px 12px', borderRadius: 12,
     fontSize: 13, lineHeight: 1.55,
   },
+  // ⭐ Bot bubble — dark
   bubbleBot: {
-    background: 'var(--cream)', color: 'var(--earth)',
+    background: '#1a2e1a',
+    border: '1px solid #3a5c3a',
+    color: '#d4e8c2',
     borderBottomLeftRadius: 3,
   },
+  // ⭐ User bubble — lime
   bubbleUser: {
-    background: 'var(--green)', color: '#fff',
+    background: '#c8e840',
+    color: '#1a2e1a',
+    fontWeight: 500,
     borderBottomRightRadius: 3,
   },
-  typing: {
-    display: 'flex', gap: 4, padding: '2px 4px',
-    '& span': {
-      width: 6, height: 6, borderRadius: '50%',
-      background: '#aaa', display: 'inline-block',
-      animation: 'bounce 1.2s infinite',
-    }
+
+  // Typing dots
+  typingDots: { display: 'flex', gap: 5, alignItems: 'center' },
+  dot: {
+    width: 7, height: 7, borderRadius: '50%',
+    background: '#c8e840', display: 'inline-block',
   },
+
+  // ⭐ Dark suggestions
   suggestions: {
     padding: '0 12px 10px', display: 'flex', flexWrap: 'wrap', gap: 6,
+    background: '#0f1f0f',
   },
   suggestion: {
     fontSize: 11, padding: '5px 10px', borderRadius: 20,
-    border: '1px solid var(--border)', background: '#fff',
-    color: 'var(--earth-mid)', cursor: 'pointer',
+    border: '1px solid #3a5c3a', background: '#1a2e1a',
+    color: '#7a9e6e', cursor: 'pointer',
     fontFamily: 'var(--font-body)', transition: 'all 0.15s',
   },
+
+  // ⭐ Dark input row
   inputRow: {
     display: 'flex', alignItems: 'flex-end', gap: 8,
-    padding: '10px 12px', borderTop: '1px solid var(--border)',
-    background: '#fff',
+    padding: '10px 12px',
+    borderTop: '1px solid #3a5c3a',
+    background: '#1a2e1a',
   },
   input: {
-    flex: 1, resize: 'none', border: '1.5px solid var(--border)',
+    flex: 1, resize: 'none',
+    border: '1.5px solid #3a5c3a',
     borderRadius: 8, padding: '8px 12px', fontSize: 13,
     fontFamily: 'var(--font-body)', lineHeight: 1.4,
     maxHeight: 80, outline: 'none',
+    background: '#0f1f0f',
+    color: '#d4e8c2',
+    caretColor: '#c8e840',
   },
   sendBtn: {
     width: 34, height: 34, borderRadius: 8, flexShrink: 0,
-    background: 'var(--green)', border: 'none',
-    color: '#fff', cursor: 'pointer',
+    background: '#c8e840', border: 'none',
+    cursor: 'pointer',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    opacity: 1, transition: 'opacity 0.15s',
+    transition: 'opacity 0.15s',
   },
 }

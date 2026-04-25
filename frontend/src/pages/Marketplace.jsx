@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import api from '../utils/api'
 import ListingCard from '../components/ListingCard'
-import { RiSearchLine, RiFilterLine } from 'react-icons/ri'
+import { RiSearchLine } from 'react-icons/ri'
 
 const CATEGORIES = ['', 'vegetables', 'fruits', 'grains', 'dairy', 'spices', 'other']
 const SORT_OPTIONS = [
@@ -50,36 +50,50 @@ export default function Marketplace() {
   const handleSearch = (e) => { e.preventDefault(); setPage(1); fetchListings() }
 
   return (
-    <div style={{ padding: '32px 0 60px' }}>
+    // ⭐ FIX 1: paddingTop accounts for fixed navbar height
+    <div style={{ padding: '90px 0 60px' }}>
       <div className="container">
-        <div style={s.header}>
-          <div>
-            <h1 style={s.h1}>Marketplace</h1>
-            <p style={s.sub}>{total} listings available from verified farmers</p>
-          </div>
+
+        {/* ⭐ FIX 2: Hero header with dark farm theme */}
+        <div style={s.hero}>
+          <h1 style={s.h1}>Marketplace</h1>
+          <p style={s.sub}>{total} listings available from verified farmers</p>
         </div>
 
-        {/* Filters bar */}
+        {/* ⭐ FIX 3: Dark themed filter bar */}
         <div style={s.filtersBar}>
+
+          {/* Search */}
           <form onSubmit={handleSearch} style={s.searchForm}>
-            <RiSearchLine size={16} color="#999" style={{ flexShrink: 0 }} />
-            <input value={search} onChange={e => setSearch(e.target.value)}
+            <RiSearchLine size={16} color="#a3b899" style={{ flexShrink: 0 }} />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
               placeholder="Search tomatoes, wheat, mango..."
-              style={{ border: 'none', background: 'none', outline: 'none', flex: 1, fontSize: 14 }} />
+              style={s.searchInput}
+            />
           </form>
 
-          <select value={category} onChange={e => { setCategory(e.target.value); setPage(1) }} style={s.filterSelect}>
-            {CATEGORIES.map(c => <option key={c} value={c}>{c ? c.charAt(0).toUpperCase() + c.slice(1) : 'All categories'}</option>)}
+          <div style={s.divider} />
+
+          {/* Category */}
+          <select value={category} onChange={e => { setCategory(e.target.value); setPage(1) }} style={s.select}>
+            {CATEGORIES.map(c => (
+              <option key={c} value={c}>{c ? c.charAt(0).toUpperCase() + c.slice(1) : 'All categories'}</option>
+            ))}
           </select>
 
-          <input type="number" placeholder="Min ₹" value={minPrice} onChange={e => setMinPrice(e.target.value)}
-            style={{ ...s.filterSelect, width: 90 }} />
-          <input type="number" placeholder="Max ₹" value={maxPrice} onChange={e => setMaxPrice(e.target.value)}
-            style={{ ...s.filterSelect, width: 90 }} />
+          {/* Price range */}
+          <input type="number" placeholder="Min ₹" value={minPrice}
+            onChange={e => setMinPrice(e.target.value)} style={{ ...s.select, width: 90 }} />
+          <input type="number" placeholder="Max ₹" value={maxPrice}
+            onChange={e => setMaxPrice(e.target.value)} style={{ ...s.select, width: 90 }} />
 
-          <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={s.filterSelect}>
+          {/* Sort */}
+          <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={s.select}>
             {SORT_OPTIONS.map(o => <option key={o.val} value={o.val}>{o.label}</option>)}
           </select>
+
         </div>
 
         {loading ? (
@@ -113,12 +127,79 @@ export default function Marketplace() {
 }
 
 const s = {
-  header: { marginBottom: 24 },
-  h1: { fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 600, color: 'var(--earth)' },
-  sub: { color: '#999', fontSize: 14, marginTop: 4 },
-  filtersBar: { display: 'flex', alignItems: 'center', gap: 10, background: '#fff', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 16px', marginBottom: 28, flexWrap: 'wrap' },
-  searchForm: { display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 200 },
-  filterSelect: { border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', padding: '6px 10px', fontSize: 13, color: 'var(--earth)', background: '#fff', cursor: 'pointer' },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 },
-  pagination: { display: 'flex', justifyContent: 'center', gap: 8, marginTop: 40 },
+  // ⭐ Dark hero section
+  hero: {
+    background: 'linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%)',
+    borderRadius: '16px',
+    padding: '36px 32px',
+    marginBottom: 24,
+    borderLeft: '4px solid #8bc34a',
+  },
+  h1: {
+    fontFamily: 'var(--font-display)',
+    fontSize: 36,
+    fontWeight: 700,
+    color: '#c8e6a0',  // ⭐ lime green like your listing cards
+    margin: 0,
+  },
+  sub: {
+    color: '#7a9e6e',
+    fontSize: 14,
+    marginTop: 6,
+  },
+
+  // ⭐ Dark themed filter bar
+  filtersBar: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    background: '#1e2f1e',          // ⭐ dark green instead of white
+    border: '1px solid #3a5c3a',
+    borderRadius: '12px',
+    padding: '12px 18px',
+    marginBottom: 28,
+    flexWrap: 'wrap',
+  },
+  searchForm: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+    minWidth: 200,
+  },
+  searchInput: {
+    border: 'none',
+    background: 'none',
+    outline: 'none',
+    flex: 1,
+    fontSize: 14,
+    color: '#d4e8c2',              // ⭐ light green text
+  },
+  divider: {
+    width: 1,
+    height: 24,
+    background: '#3a5c3a',
+  },
+  select: {
+    border: '1px solid #3a5c3a',
+    borderRadius: '8px',
+    padding: '6px 10px',
+    fontSize: 13,
+    color: '#d4e8c2',              // ⭐ light green text
+    background: '#2a3f2a',         // ⭐ dark green background
+    cursor: 'pointer',
+    outline: 'none',
+  },
+
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gap: 20,
+  },
+  pagination: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 40,
+  },
 }
